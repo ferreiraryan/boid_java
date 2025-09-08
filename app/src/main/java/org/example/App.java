@@ -23,6 +23,8 @@ public class App extends JPanel implements ActionListener {
   private final Mundo mundo;
   private final Renderizador renderizador;
 
+  private final GerenciadorDeEntrada gerenciadorDeEntrada;
+
   public App() {
     setPreferredSize(new Dimension(LARGURA, ALTURA));
     imagem = new BufferedImage(LARGURA, ALTURA, BufferedImage.TYPE_INT_RGB);
@@ -30,7 +32,9 @@ public class App extends JPanel implements ActionListener {
 
     this.mundo = new Mundo();
     this.renderizador = new Renderizador(LARGURA, ALTURA, pixels);
+    this.gerenciadorDeEntrada = new GerenciadorDeEntrada(mundo);
 
+    addMouseMotionListener(gerenciadorDeEntrada);
     iniciarGameLoop();
   }
 
