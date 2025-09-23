@@ -14,6 +14,8 @@ public class Mundo {
     mouseBoid = new Boid(-100, -100);
     mouseBoid.forcaMaxima = 20;
 
+    boids.add(new Boid(200, 300));
+
     Random gerador = new Random();
     while (boids.size() < 100) {
       int posx = gerador.nextInt(10, 890);

@@ -13,6 +13,10 @@ class Vector2D {
     this.y = y;
   }
 
+  public Vector2D clone() {
+    return new Vector2D(this.x, this.y);
+  }
+
   public void add(Vector2D outro) {
     this.x += outro.x;
     this.y += outro.y;

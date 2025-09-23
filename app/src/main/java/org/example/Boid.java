@@ -7,32 +7,85 @@ public class Boid {
   public Vector2D position;
   public Vector2D velocidade;
   public Vector2D aceleracao;
+  private double wanderAngle;
 
   public int cor = 0xFFFFFF;
   public int tamanho = 5;
+  private Random rand;
   final double velocidadeMaxima = 2.0;
   public double forcaMaxima = 1;
 
   public Boid(double x, double y) {
     this.position = new Vector2D(x, y);
-
-    Random ramdom = new Random();
-    double angulo = ramdom.nextDouble() * 2 * Math.PI;
-    this.velocidade = new Vector2D(Math.cos(angulo), Math.sin(angulo));
-    this.velocidade.multiply(2.0);
-
+    this.rand = new Random();
     this.aceleracao = new Vector2D(0, 0);
+
+    double angulo = this.rand.nextDouble() * 2 * Math.PI;
+    this.velocidade = new Vector2D(Math.cos(angulo), Math.sin(angulo));
+
+    this.wanderAngle = rand.nextDouble() * 2 * Math.PI;
   }
 
   public void update(ArrayList<Boid> todosOsBoids) {
-    // aceleracao.add(this.alinhar(todosOsBoids));
+    double pesoSeparacao = 1.8;
+    double pesoAlinhamento = 1.0;
+    double pesoCoesao = 1.0;
+    double pesoVagueio = 0.02;
+
+    Vector2D forcaSeparacao = this.separation(todosOsBoids);
+    Vector2D forcaAlinhamento = this.alinhar(todosOsBoids);
+    Vector2D forcaCoesao = this.coersao(todosOsBoids);
+    Vector2D forcaVagueio = this.vaguear();
+
+    forcaSeparacao.multiply(pesoSeparacao);
+    forcaAlinhamento.multiply(pesoAlinhamento);
+    forcaCoesao.multiply(pesoCoesao);
+    forcaVagueio.multiply(pesoVagueio);
+
+    this.applyForce(forcaSeparacao);
+    this.applyForce(forcaAlinhamento);
+    this.applyForce(forcaCoesao);
+    this.applyForce(forcaVagueio);
+
     velocidade.add(aceleracao);
-    velocidade.add(alinhar(todosOsBoids));
-    velocidade.add(coersao(todosOsBoids));
-    velocidade.add(separation(todosOsBoids));
     velocidade.limit(velocidadeMaxima);
     position.add(velocidade);
     aceleracao.multiply(0);
+  }
+
+  // Lembre-se que o método applyForce é simplesmente:
+  private void applyForce(Vector2D force) {
+    this.aceleracao.add(force);
+  }
+
+  private Vector2D vaguear() {
+    // --- Parâmetros que você pode ajustar para mudar o comportamento ---
+    double wanderDistance = 10.0; // Distância do círculo à frente do boid
+    double wanderRadius = 25.0; // Raio do círculo
+    double angleChange = 0.2; // O quanto o ângulo pode mudar a cada passo
+
+    // 1. Calcula a posição do centro do círculo
+    Vector2D circleCenter = velocidade.clone();
+    if (circleCenter.magnitude() == 0) { // Evita erro se o boid estiver parado
+      circleCenter = new Vector2D(1, 0);
+    }
+    circleCenter.normalize();
+    circleCenter.multiply(wanderDistance);
+
+    // 2. Muda um pouco o ângulo de vagueio
+    this.wanderAngle += (rand.nextDouble() * angleChange * 2) - angleChange;
+
+    // 3. Calcula o novo ponto na borda do círculo
+    double targetX = wanderRadius * Math.cos(this.wanderAngle);
+    double targetY = wanderRadius * Math.sin(this.wanderAngle);
+    Vector2D displacement = new Vector2D(targetX, targetY);
+
+    // 4. A força de vagueio é o vetor que aponta para esse novo ponto
+    // É preciso clonar o circleCenter para não modificar o original nesta soma
+    Vector2D wanderForce = circleCenter.clone();
+    wanderForce.add(displacement);
+
+    return wanderForce;
   }
 
   public Vector2D separation(ArrayList<Boid> boids) {
