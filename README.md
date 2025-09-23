@@ -38,8 +38,10 @@ A lógica do projeto está dividida nos seguintes arquivos principais:
 ├── src/
 │   ├── App.java          # Ponto de entrada, cria a janela e inicia a simulação.
 │   ├── Boid.java         # Representa cada agente (boid), com posição, velocidade e regras de movimento.
-│   ├── Simulador.java    # Gerencia a lógica da simulação e aplica as regras de separação, coesão e alinhamento.
-│   └── Renderizador.java # Responsável por desenhar os boids na tela.
+│   ├── Mundo.java        # Representa o lugar onde os boids se movimentam.
+│   ├── Vector2D.java     # Classe auxiliar para melhor controle sobre os vetores.
+│   ├── Renderizador.java # Responsável por desenhar os boids na tela.
+│   └── GerenciadorDeEntrada.java  # Captura e processa os inputs do mouse (cliques, arrastar).
 ├── .gitignore
 └── README.md
 
